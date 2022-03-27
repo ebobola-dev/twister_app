@@ -39,10 +39,10 @@ class _GameViewState extends State<GameView> {
     spinController.stream.listen((index) {
       _fortuneTimer?.cancel();
       _fortuneTimer = Timer(const Duration(seconds: 3), () {
-        final gameState = gameBloc.state as GameStartedState;
         final bool forCurrent = furtuneBloc.state is FortuneSpinnigCurrentState;
-        final player =
-            forCurrent ? gameState.movePlayer : gameState.lastMovePlayer!;
+        final player = forCurrent
+            ? gameBloc.state.movePlayer
+            : gameBloc.state.lastMovePlayer!;
         final part = movesList[index][2] as BodyParts;
         final color = movesList[index][1] as Color;
         furtuneBloc.add(
@@ -73,266 +73,146 @@ class _GameViewState extends State<GameView> {
   Widget build(BuildContext context) {
     final fortuneBloc = context.read<FortuneBloc>();
     final gameBloc = context.read<GameBloc>();
-    return BlocBuilder<GameBloc, GameState>(
-      buildWhen: (previous, current) =>
-          previous.runtimeType != current.runtimeType,
-      builder: (context, globalState) {
-        if (globalState is GameStartedState) {
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      child: BlocBuilder<GameBloc, GameState>(
-                        buildWhen: (previous, current) {
-                          if (previous is GameStartedState &&
-                              current is GameStartedState) {
-                            return previous.livePlayers != current.livePlayers;
-                          } else {
-                            return previous != current;
-                          }
-                        },
-                        builder: (context, gameState) {
-                          gameState as GameStartedState;
-                          return FadeAnimation(
-                            from: AxisDirection.left,
-                            order: 3,
-                            duration: const Duration(milliseconds: 500),
-                            child: Wrap(
-                              alignment: WrapAlignment.start,
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: List.generate(
-                                gameState.livePlayers.length,
-                                (index) => PlayerChip(
-                                  player: gameState.livePlayers[index],
-                                  deleteColor: moveColors[index % 4],
-                                  onDelete: (player) => gameBloc
-                                      .add(GameRemovePlayerEvent(player)),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    FadeAnimation(
-                      from: AxisDirection.right,
-                      order: 3,
-                      duration: const Duration(milliseconds: 500),
-                      child: SquareButton(
-                        child: const FaIcon(
-                          FontAwesomeIcons.circleInfo,
-                          color: Colors.white,
-                        ),
-                        onTap: () => showDialog(
-                          context: context,
-                          builder: (context) => const GameInfo(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: MediaQuery.of(context).size.width,
-                  child: FadeAnimation(
-                    order: 4,
-                    duration: const Duration(milliseconds: 500),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: BlocBuilder<GameBloc, GameState>(
+                  buildWhen: (previous, current) =>
+                      previous.livePlayers != current.livePlayers,
+                  builder: (context, gameState) => FadeAnimation(
                     from: AxisDirection.left,
-                    child: FortuneWheel(
-                      duration: const Duration(seconds: 3),
-                      selected: spinController.stream,
-                      animateFirst: false,
-                      items: movesList.map(
-                        (move) {
-                          final list = move[0] as List;
-                          return FortuneItem(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(list[0] as String),
-                                const SizedBox(width: 5),
-                                SvgPicture.asset(
-                                  list[1],
-                                  width: 20,
-                                  color: Colors.white,
-                                ),
-                              ],
-                            ),
-                            style: FortuneItemStyle(
-                              color: move[1] as Color,
-                              textStyle:
-                                  const TextStyle(fontFamily: "Montserrat"),
-                            ),
-                          );
-                        },
-                      ).toList(),
+                    order: 3,
+                    duration: const Duration(milliseconds: 500),
+                    child: Wrap(
+                      alignment: WrapAlignment.start,
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: List.generate(
+                        gameState.livePlayers.length,
+                        (index) => PlayerChip(
+                          player: gameState.livePlayers[index],
+                          deleteColor: moveColors[index % 4],
+                          onDelete: (player) =>
+                              gameBloc.add(GameRemovePlayerEvent(player)),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    children: [
-                      FadeAnimation(
-                        from: AxisDirection.right,
-                        order: 5,
-                        duration: const Duration(milliseconds: 500),
-                        child: SizedBox(
-                          height: 60,
-                          child: BlocBuilder<GameBloc, GameState>(
-                            builder: (context, gameState) =>
-                                BlocBuilder<FortuneBloc, FortuneState>(
-                              builder: (context, fortuneState) {
-                                gameState as GameStartedState;
-                                final Widget choice;
-                                if (fortuneState is FortuneChosenState &&
-                                    gameState.moves.isNotEmpty) {
-                                  choice = Row(
-                                    key: const ValueKey(1),
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        fortuneState.player,
-                                        style: const TextStyle(fontSize: 16.0),
-                                      ),
-                                      const FaIcon(
-                                        FontAwesomeIcons.rightLong,
-                                      ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            "${translateParts[fortuneState.part]![2]} ",
-                                            style:
-                                                const TextStyle(fontSize: 16.0),
-                                          ),
-                                          Text(
-                                            translateColors[fortuneState.color]!
-                                                .toLowerCase(),
-                                            style: TextStyle(
-                                              fontSize: 16.0,
-                                              color: fortuneState.color,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  );
-                                } else {
-                                  choice = const LoadingIndicator(
-                                    key: ValueKey(0),
-                                    indicatorType: Indicator.ballPulseRise,
-                                    colors: moveColors,
-                                  );
-                                }
-                                return AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 400),
-                                  transitionBuilder: (Widget child,
-                                      Animation<double> animation) {
-                                    return ScaleTransition(
-                                      scale: animation,
-                                      child: child,
-                                    );
-                                  },
-                                  child: choice,
-                                );
-                              },
-                            ),
+              ),
+              FadeAnimation(
+                from: AxisDirection.right,
+                order: 3,
+                duration: const Duration(milliseconds: 500),
+                child: SquareButton(
+                  child: const FaIcon(
+                    FontAwesomeIcons.circleInfo,
+                    color: Colors.white,
+                  ),
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (context) => const GameInfo(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: MediaQuery.of(context).size.width,
+            child: FadeAnimation(
+              order: 4,
+              duration: const Duration(milliseconds: 500),
+              from: AxisDirection.left,
+              child: FortuneWheel(
+                duration: const Duration(seconds: 3),
+                selected: spinController.stream,
+                animateFirst: false,
+                items: movesList.map(
+                  (move) {
+                    final list = move[0] as List;
+                    return FortuneItem(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(list[0] as String),
+                          const SizedBox(width: 5),
+                          SvgPicture.asset(
+                            list[1],
+                            width: 20,
+                            color: Colors.white,
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      FadeAnimation(
-                        from: AxisDirection.down,
-                        order: 6,
-                        duration: const Duration(milliseconds: 500),
-                        child: BlocBuilder<GameBloc, GameState>(
-                          buildWhen: (previous, current) {
-                            if (previous is GameStartedState &&
-                                current is GameStartedState) {
-                              return previous.movePlayer != current.movePlayer;
-                            } else {
-                              return previous != current;
-                            }
-                          },
-                          builder: (context, gameState) {
-                            gameState as GameStartedState;
-                            return BlocBuilder<FortuneBloc, FortuneState>(
-                              builder: (context, fortuneState) => ButtonTheme(
-                                height: 60,
-                                child: ElevatedButton(
-                                  onPressed: fortuneState.runtimeType !=
-                                              FortuneSpinnigCurrentState &&
-                                          fortuneState.runtimeType !=
-                                              FortuneSpinnigLastState
-                                      ? () {
-                                          spinController.add(
-                                            Fortune.randomInt(
-                                                0, movesList.length),
-                                          );
-                                          fortuneBloc
-                                              .add(FortuneSpinEvent(true));
-                                        }
-                                      : null,
-                                  child: Text(
-                                      "Крутить для игрока ${gameState.movePlayer}"),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                      style: FortuneItemStyle(
+                        color: move[1] as Color,
+                        textStyle: const TextStyle(fontFamily: "Montserrat"),
                       ),
-                      const SizedBox(height: 10),
-                      BlocBuilder<GameBloc, GameState>(
-                        buildWhen: (previous, current) {
-                          if (previous is GameStartedState &&
-                              current is GameStartedState) {
-                            return previous.lastMovePlayer !=
-                                current.lastMovePlayer;
-                          } else {
-                            return previous != current;
-                          }
-                        },
-                        builder: (context, gameState) {
-                          gameState as GameStartedState;
-                          final Widget button;
-                          if (gameState.lastMovePlayer == null) {
-                            button = Container(key: const ValueKey(0));
-                          } else {
-                            button = BlocBuilder<FortuneBloc, FortuneState>(
+                    );
+                  },
+                ).toList(),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: Column(
+              children: [
+                FadeAnimation(
+                  from: AxisDirection.right,
+                  order: 5,
+                  duration: const Duration(milliseconds: 500),
+                  child: SizedBox(
+                    height: 60,
+                    child: BlocBuilder<GameBloc, GameState>(
+                      builder: (context, gameState) =>
+                          BlocBuilder<FortuneBloc, FortuneState>(
+                        builder: (context, fortuneState) {
+                          final Widget choice;
+                          if (fortuneState is FortuneChosenState &&
+                              gameState.moves.isNotEmpty) {
+                            choice = Row(
                               key: const ValueKey(1),
-                              builder: (context, fortuneState) => FadeAnimation(
-                                from: AxisDirection.down,
-                                duration: const Duration(milliseconds: 500),
-                                child: ButtonTheme(
-                                  height: 60,
-                                  child: ElevatedButton(
-                                    onPressed: fortuneState.runtimeType !=
-                                                FortuneSpinnigCurrentState &&
-                                            fortuneState.runtimeType !=
-                                                FortuneSpinnigLastState
-                                        ? () {
-                                            spinController.add(
-                                              Fortune.randomInt(
-                                                  0, movesList.length),
-                                            );
-                                            fortuneBloc
-                                                .add(FortuneSpinEvent(false));
-                                          }
-                                        : null,
-                                    child: Text(
-                                        "Ещё раз для игрока ${gameState.lastMovePlayer}"),
-                                  ),
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  fortuneState.player,
+                                  style: const TextStyle(fontSize: 16.0),
                                 ),
-                              ),
+                                const FaIcon(
+                                  FontAwesomeIcons.rightLong,
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "${translateParts[fortuneState.part]![2]} ",
+                                      style: const TextStyle(fontSize: 16.0),
+                                    ),
+                                    Text(
+                                      translateColors[fortuneState.color]!
+                                          .toLowerCase(),
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        color: fortuneState.color,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          } else {
+                            choice = const LoadingIndicator(
+                              key: ValueKey(0),
+                              indicatorType: Indicator.ballPulseRise,
+                              colors: moveColors,
                             );
                           }
                           return AnimatedSwitcher(
@@ -344,21 +224,99 @@ class _GameViewState extends State<GameView> {
                                 child: child,
                               );
                             },
-                            child: button,
+                            child: choice,
                           );
                         },
                       ),
-                    ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
+                FadeAnimation(
+                  from: AxisDirection.down,
+                  order: 6,
+                  duration: const Duration(milliseconds: 500),
+                  child: BlocBuilder<GameBloc, GameState>(
+                    buildWhen: (previous, current) =>
+                        previous.movePlayer != current.movePlayer,
+                    builder: (context, gameState) {
+                      return BlocBuilder<FortuneBloc, FortuneState>(
+                        builder: (context, fortuneState) => ButtonTheme(
+                          height: 60,
+                          child: ElevatedButton(
+                            onPressed: fortuneState.runtimeType !=
+                                        FortuneSpinnigCurrentState &&
+                                    fortuneState.runtimeType !=
+                                        FortuneSpinnigLastState
+                                ? () {
+                                    spinController.add(
+                                      Fortune.randomInt(0, movesList.length),
+                                    );
+                                    fortuneBloc.add(FortuneSpinEvent(true));
+                                  }
+                                : null,
+                            child: Text(
+                                "Крутить для игрока ${gameState.movePlayer}"),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
+                BlocBuilder<GameBloc, GameState>(
+                  buildWhen: (previous, current) =>
+                      previous.lastMovePlayer != current.lastMovePlayer,
+                  builder: (context, gameState) {
+                    final Widget button;
+                    if (gameState.lastMovePlayer == null) {
+                      button = Container(key: const ValueKey(0));
+                    } else {
+                      button = BlocBuilder<FortuneBloc, FortuneState>(
+                        key: const ValueKey(1),
+                        builder: (context, fortuneState) => FadeAnimation(
+                          from: AxisDirection.down,
+                          duration: const Duration(milliseconds: 500),
+                          child: ButtonTheme(
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: fortuneState.runtimeType !=
+                                          FortuneSpinnigCurrentState &&
+                                      fortuneState.runtimeType !=
+                                          FortuneSpinnigLastState
+                                  ? () {
+                                      spinController.add(
+                                        Fortune.randomInt(0, movesList.length),
+                                      );
+                                      fortuneBloc.add(FortuneSpinEvent(false));
+                                    }
+                                  : null,
+                              child: Text(
+                                  "Ещё раз для игрока ${gameState.lastMovePlayer}"),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        );
+                      },
+                      child: button,
+                    );
+                  },
+                ),
               ],
             ),
-          );
-        } else {
-          return Container();
-        }
-      },
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 }

@@ -19,23 +19,26 @@ class StartScreen extends StatelessWidget {
               width: double.infinity,
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      FadeAnimation(
-                        from: AxisDirection.up,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(7.0),
-                          ),
-                          padding: const EdgeInsets.all(8.0),
-                          child: const ChangeThemeButton(
-                            iconColor: Colors.white,
+                  Container(
+                    margin: const EdgeInsets.only(right: 5.0, top: 5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FadeAnimation(
+                          from: AxisDirection.up,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(7.0),
+                            ),
+                            padding: const EdgeInsets.all(8.0),
+                            child: const ChangeThemeButton(
+                              iconColor: Colors.white,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Expanded(
                     child: Column(

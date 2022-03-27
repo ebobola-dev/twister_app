@@ -7,162 +7,104 @@ import 'package:twister_app/models/move/move.dart';
 
 class GameBloc extends Bloc<GameEvent, GameState> {
   Timer? updateSecondsTimer;
-  GameBloc() : super(GameNotStartedState()) {
-    on<GameStartEvent>((event, emit) {
-      if (state is GameNotStartedState) {
-        emit(GameStartedState(
-          livePlayers: event.players,
-          deadPlayers: const [],
-          movePlayer: event.players.first,
-        ));
 
-        updateSecondsTimer = Timer.periodic(
-          const Duration(seconds: 1),
-          (_) => add(GameIncrementSeconds()),
-        );
-      }
-    });
-
-    on<GameContinueGameEvent>((event, emit) {
-      if (state is GameNotStartedState) {
-        emit(GameStartedState(
-          livePlayers: event.livePlayers,
-          deadPlayers: event.deadPlayers,
-          movePlayer: event.movePlayer,
-          lastMovePlayer: event.moveLastPlayers,
-          moves: event.moves,
-          seconds: event.seconds,
-        ));
-
-        updateSecondsTimer = Timer.periodic(
-          const Duration(seconds: 1),
-          (_) => add(GameIncrementSeconds()),
-        );
-      }
-    });
+  GameBloc({List<String>? players, GameState? oldState})
+      : assert(players != null || oldState != null),
+        super(oldState ??
+            GameState(
+              livePlayers: players!,
+              deadPlayers: const [],
+              movePlayer: players.first,
+            )) {
+    updateSecondsTimer?.cancel();
+    updateSecondsTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => add(GameIncrementSeconds()),
+    );
 
     on<GameRestartEvent>((event, emit) {
-      if (state is GameStartedState) {
-        final state_ = state as GameStartedState;
-        emit(GameStartedState(
-          livePlayers: state_.livePlayers + state_.deadPlayers,
-          deadPlayers: const [],
-          movePlayer: state_.livePlayers.first,
-        ));
-        updateSecondsTimer?.cancel();
-        updateSecondsTimer = Timer.periodic(
-          const Duration(seconds: 1),
-          (_) => add(GameIncrementSeconds()),
-        );
-      }
+      emit(GameState(
+        livePlayers: state.livePlayers + state.deadPlayers,
+        deadPlayers: const [],
+        movePlayer: state.livePlayers.first,
+      ));
+      updateSecondsTimer?.cancel();
+      updateSecondsTimer = Timer.periodic(
+        const Duration(seconds: 1),
+        (_) => add(GameIncrementSeconds()),
+      );
     });
 
     on<GameMoveEvent>((event, emit) {
-      if (state is GameStartedState) {
-        final state_ = state as GameStartedState;
+      emit(
+        state.copyWith(
+          movePlayer: getNext(state.livePlayers, state.movePlayer),
+          moves: state.moves +
+              [
+                Move(
+                  player: state.movePlayer,
+                  part: event.part,
+                  color: event.color,
+                ),
+              ],
+          lastMovePlayer: state.movePlayer,
+          updateLastMove: true,
+        ),
+      );
+    });
+
+    on<GameMoveLastEvent>((event, emit) {
+      if (state.lastMovePlayer == null) return;
+      emit(
+        state.copyWith(
+          moves: state.moves +
+              [
+                Move(
+                  player: state.lastMovePlayer!,
+                  part: event.part,
+                  color: event.color,
+                ),
+              ],
+        ),
+      );
+    });
+
+    on<GameRemovePlayerEvent>((event, emit) {
+      if (state.livePlayers.length == 2) {
+        emit(state.win(state.livePlayers
+            .where((element) => element != event.player)
+            .first));
+        updateSecondsTimer?.cancel();
+      } else {
+        String? lastPlayer = state.lastMovePlayer;
+        String nowPlayer = state.movePlayer;
+        if (event.player == lastPlayer) {
+          lastPlayer = null;
+        }
+        if (event.player == nowPlayer) {
+          nowPlayer = getNext(state.livePlayers, nowPlayer);
+        }
         emit(
-          state_.copyWith(
-            movePlayer: getNext(state_.livePlayers, state_.movePlayer),
-            moves: state_.moves +
-                [
-                  Move(
-                    player: state_.movePlayer,
-                    part: event.part,
-                    color: event.color,
-                  ),
-                ],
-            lastMovePlayer: state_.movePlayer,
+          state.copyWith(
+            livePlayers: state.livePlayers
+                .where((element) => element != event.player)
+                .toList(),
+            deadPlayers: state.deadPlayers + [event.player],
+            movePlayer: nowPlayer,
+            lastMovePlayer: lastPlayer,
             updateLastMove: true,
           ),
         );
       }
     });
 
-    on<GameMoveLastEvent>((event, emit) {
-      if (state is GameStartedState) {
-        final state_ = state as GameStartedState;
-        if (state_.lastMovePlayer == null) return;
-        emit(
-          state_.copyWith(
-            moves: state_.moves +
-                [
-                  Move(
-                    player: state_.lastMovePlayer!,
-                    part: event.part,
-                    color: event.color,
-                  ),
-                ],
-          ),
-        );
-      }
-    });
-
-    on<GameRemovePlayerEvent>((event, emit) {
-      if (state is GameStartedState) {
-        final state_ = state as GameStartedState;
-        if (state_.livePlayers.length == 2) {
-          emit(GameFinishedState(
-            winner: state_.livePlayers
-                .where((element) => element != event.player)
-                .first,
-            seconds: state_.seconds,
-            players: state_.livePlayers + state_.deadPlayers,
-            moves: state_.moves,
-          ));
-          updateSecondsTimer?.cancel();
-        } else {
-          String? lastPlayer = state_.lastMovePlayer;
-          String nowPlayer = state_.movePlayer;
-          if (event.player == lastPlayer) {
-            lastPlayer = null;
-          }
-          if (event.player == nowPlayer) {
-            nowPlayer = getNext(state_.livePlayers, nowPlayer);
-          }
-          emit(
-            state_.copyWith(
-              livePlayers: state_.livePlayers
-                  .where((element) => element != event.player)
-                  .toList(),
-              deadPlayers: state_.deadPlayers + [event.player],
-              movePlayer: nowPlayer,
-              lastMovePlayer: lastPlayer,
-              updateLastMove: true,
-            ),
-          );
-        }
-      }
-    });
-
     on<GameFinishEvent>((event, emit) {
-      if (state is GameStartedState) {
-        final state_ = state as GameStartedState;
-        emit(GameFinishedState(
-          winner: event.winner,
-          seconds: state_.seconds,
-          players: state_.livePlayers + state_.deadPlayers,
-          moves: state_.moves,
-        ));
-        updateSecondsTimer?.cancel();
-      }
-    });
-
-    on<GameSaveEvent>((event, emit) {
-      if (state is GameStartedState) {
-        //TODO SAVE STARTED GAME
-        emit(GameNotStartedState());
-        updateSecondsTimer?.cancel();
-      } else if (state is GameFinishedState) {
-        //TODO SAVE FINISHED GAME
-        emit(GameNotStartedState());
-      }
+      emit(state.win(event.winner));
+      updateSecondsTimer?.cancel();
     });
 
     on<GameIncrementSeconds>((event, emit) {
-      if (state is GameStartedState) {
-        final state_ = state as GameStartedState;
-        emit(state_.copyWith(seconds: state_.seconds + 1));
-      }
+      emit(state.copyWith(seconds: state.seconds + 1));
     });
   }
 

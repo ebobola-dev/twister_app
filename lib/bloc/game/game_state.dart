@@ -4,40 +4,9 @@ import 'package:twister_app/models/move/move.dart';
 
 part 'game_state.g.dart';
 
-String _getTime(int seconds) {
-  if (seconds < 60) {
-    return seconds > 9 ? "00:$seconds" : "00:0$seconds";
-  } else if (seconds < 3600) {
-    final minutes = seconds ~/ 60;
-    final seconds_ = seconds - 60 * minutes;
-    if (minutes > 9) {
-      return seconds_ > 9 ? "$minutes:$seconds_" : "$minutes:0$seconds_";
-    } else {
-      return seconds_ > 9 ? "0$minutes:$seconds_" : "0$minutes:0$seconds_";
-    }
-  } else {
-    final hours = seconds ~/ 3600;
-    final minutes = seconds ~/ 60 - 60 * hours;
-    final seconds_ = seconds - 3600 * hours - 60 * minutes;
-    if (minutes > 9) {
-      return seconds_ > 9 ? "$hours:$minutes:$seconds_" : "$minutes:0$seconds_";
-    } else {
-      return seconds_ > 9
-          ? "$hours:0$minutes:$seconds_"
-          : "0$minutes:0$seconds_";
-    }
-  }
-}
-
-abstract class GameState extends Equatable {}
-
-class GameNotStartedState extends GameState {
-  @override
-  List<Object> get props => [];
-}
-
 @JsonSerializable()
-class GameStartedState extends GameState {
+class GameState extends Equatable {
+  final String? winner;
   final List<String> livePlayers;
   final List<String> deadPlayers;
   final String movePlayer;
@@ -45,21 +14,22 @@ class GameStartedState extends GameState {
   final List<Move> moves;
   final int seconds;
 
-  GameStartedState({
+  const GameState({
     required this.livePlayers,
     required this.deadPlayers,
     required this.movePlayer,
     this.lastMovePlayer,
     this.moves = const [],
     this.seconds = 0,
+    this.winner,
   });
 
-  factory GameStartedState.fromJson(Map<String, dynamic> json) =>
-      _$GameStartedStateFromJson(json);
+  factory GameState.fromJson(Map<String, dynamic> json) =>
+      _$GameStateFromJson(json);
 
-  Map<String, dynamic> toJson() => _$GameStartedStateToJson(this);
+  Map<String, dynamic> toJson() => _$GameStateToJson(this);
 
-  GameStartedState copyWith({
+  GameState copyWith({
     List<String>? livePlayers,
     List<String>? deadPlayers,
     String? movePlayer,
@@ -68,13 +38,24 @@ class GameStartedState extends GameState {
     String? lastMovePlayer,
     bool updateLastMove = false,
   }) =>
-      GameStartedState(
+      GameState(
         livePlayers: livePlayers ?? this.livePlayers,
         deadPlayers: deadPlayers ?? this.deadPlayers,
         movePlayer: movePlayer ?? this.movePlayer,
         moves: moves ?? this.moves,
         lastMovePlayer: updateLastMove ? lastMovePlayer : this.lastMovePlayer,
         seconds: seconds ?? this.seconds,
+      );
+
+  GameState win(String winner) => GameState(
+        winner: winner,
+        livePlayers: [winner],
+        deadPlayers: deadPlayers +
+            livePlayers.where((element) => element != winner).toList(),
+        movePlayer: winner,
+        lastMovePlayer: null,
+        seconds: seconds,
+        moves: moves,
       );
 
   @override
@@ -95,35 +76,30 @@ class GameStartedState extends GameState {
         moves,
       ];
 
-  String getTime() => _getTime(seconds);
-}
-
-@JsonSerializable()
-class GameFinishedState extends GameState {
-  final String winner;
-  final int seconds;
-  final List<String> players;
-  final List<Move> moves;
-
-  GameFinishedState({
-    required this.winner,
-    required this.seconds,
-    required this.players,
-    required this.moves,
-  });
-
-  factory GameFinishedState.fromJson(Map<String, dynamic> json) =>
-      _$GameFinishedStateFromJson(json);
-
-  Map<String, dynamic> toJson() => _$GameFinishedStateToJson(this);
-
-  @override
-  List<Object> get props => [
-        winner,
-        seconds,
-        players,
-        moves,
-      ];
-
-  String getTime() => _getTime(seconds);
+  String getTime() {
+    if (seconds < 60) {
+      return seconds > 9 ? "00:$seconds" : "00:0$seconds";
+    } else if (seconds < 3600) {
+      final minutes = seconds ~/ 60;
+      final seconds_ = seconds - 60 * minutes;
+      if (minutes > 9) {
+        return seconds_ > 9 ? "$minutes:$seconds_" : "$minutes:0$seconds_";
+      } else {
+        return seconds_ > 9 ? "0$minutes:$seconds_" : "0$minutes:0$seconds_";
+      }
+    } else {
+      final hours = seconds ~/ 3600;
+      final minutes = seconds ~/ 60 - 60 * hours;
+      final seconds_ = seconds - 3600 * hours - 60 * minutes;
+      if (minutes > 9) {
+        return seconds_ > 9
+            ? "$hours:$minutes:$seconds_"
+            : "$minutes:0$seconds_";
+      } else {
+        return seconds_ > 9
+            ? "$hours:0$minutes:$seconds_"
+            : "0$minutes:0$seconds_";
+      }
+    }
+  }
 }

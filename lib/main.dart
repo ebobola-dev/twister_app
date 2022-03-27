@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:twister_app/bloc/add_player/add_player_bloc.dart';
 import 'package:twister_app/bloc/added_players/added_players_bloc.dart';
 import 'package:twister_app/bloc/fortune/fortune_bloc.dart';
-import 'package:twister_app/bloc/game/game_bloc.dart';
 import 'package:twister_app/databases/pref/theme.dart';
 import 'package:twister_app/screens/create_players_screen/create_players_screen.dart';
 import 'package:twister_app/screens/game_screen/game_screen.dart';
@@ -30,7 +29,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => AddPlayerBloc()),
         BlocProvider(create: (context) => AddedPlayersBloc()),
         BlocProvider(create: (context) => FortuneBloc()),
-        BlocProvider(create: (context) => GameBloc())
       ],
       child: ThemeProvider(
         initTheme: getThemeData(context, initDark ? darkTheme : lightTheme),

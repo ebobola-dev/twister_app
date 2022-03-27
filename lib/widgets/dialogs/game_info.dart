@@ -35,40 +35,23 @@ class GameInfo extends StatelessWidget {
                 child: Column(
                   children: [
                     BlocBuilder<GameBloc, GameState>(
-                      buildWhen: (previous, current) {
-                        if (previous is GameStartedState &&
-                            current is GameStartedState) {
-                          return previous.seconds != current.seconds;
-                        } else {
-                          return previous != current;
-                        }
-                      },
-                      builder: (context, gameState) {
-                        gameState as GameStartedState;
-                        return FadeAnimation(
-                          from: AxisDirection.left,
-                          duration: const Duration(milliseconds: 500),
-                          order: 2,
-                          child: Text(
-                            "Игра идёт уже ${gameState.getTime()}",
-                            style: const TextStyle(fontSize: 16.0),
-                          ),
-                        );
-                      },
+                      buildWhen: (previous, current) =>
+                          previous.seconds != current.seconds,
+                      builder: (context, gameState) => FadeAnimation(
+                        from: AxisDirection.left,
+                        duration: const Duration(milliseconds: 500),
+                        order: 2,
+                        child: Text(
+                          "Игра идёт уже ${gameState.getTime()}",
+                          style: const TextStyle(fontSize: 16.0),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     BlocBuilder<GameBloc, GameState>(
-                      buildWhen: (previous, current) {
-                        if (previous is GameStartedState &&
-                            current is GameStartedState) {
-                          return previous.withoutSeconds !=
-                              current.withoutSeconds;
-                        } else {
-                          return previous != current;
-                        }
-                      },
+                      buildWhen: (previous, current) =>
+                          previous.withoutSeconds != current.withoutSeconds,
                       builder: (context, gameState) {
-                        gameState as GameStartedState;
                         if (gameState.moves.isEmpty) {
                           return const FadeAnimation(
                             from: AxisDirection.right,
@@ -87,16 +70,9 @@ class GameInfo extends StatelessWidget {
                       height: 10,
                     ),
                     BlocBuilder<GameBloc, GameState>(
-                      buildWhen: (previous, current) {
-                        if (previous is GameStartedState &&
-                            current is GameStartedState) {
-                          return previous.deadPlayers != current.deadPlayers;
-                        } else {
-                          return previous != current;
-                        }
-                      },
+                      buildWhen: (previous, current) =>
+                          previous.deadPlayers != current.deadPlayers,
                       builder: (context, gameState) {
-                        gameState as GameStartedState;
                         if (gameState.deadPlayers.isEmpty) {
                           return Container();
                         } else {

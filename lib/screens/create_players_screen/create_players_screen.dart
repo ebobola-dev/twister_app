@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:twister_app/bloc/game/game_bloc.dart';
-import 'package:twister_app/bloc/game/game_event.dart';
 import 'package:twister_app/widgets/animations/fade_animation.dart';
 import 'package:twister_app/bloc/add_player/add_player_bloc.dart';
 import 'package:twister_app/bloc/add_player/add_player_event.dart';
@@ -59,125 +58,129 @@ class CreatePlayersScreen extends StatelessWidget {
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FadeAnimation(
-                  from: AxisDirection.up,
-                  duration: const Duration(milliseconds: 300),
-                  order: 2,
-                  child: TextField(
-                    controller: _addPlayerField,
-                    decoration: InputDecoration(
-                      labelText: "Введите имя игрока",
-                      suffix: GestureDetector(
-                        onTap: () {
-                          _addPlayerField.clear();
-                          addPlayerBloc.add(AddPlayerClearEvent());
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FadeAnimation(
+                    from: AxisDirection.up,
+                    duration: const Duration(milliseconds: 300),
+                    order: 2,
+                    child: TextField(
+                      controller: _addPlayerField,
+                      decoration: InputDecoration(
+                        labelText: "Введите имя игрока",
+                        suffix: GestureDetector(
+                          onTap: () {
+                            _addPlayerField.clear();
+                            addPlayerBloc.add(AddPlayerClearEvent());
+                          },
+                          child: const FaIcon(FontAwesomeIcons.deleteLeft),
+                        ),
+                      ),
+                      onEditingComplete: () => addPlayer(context),
+                      onChanged: (newText) =>
+                          addPlayerBloc.add(AddPlayerChangeEvent(newText)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  FadeAnimation(
+                    from: AxisDirection.up,
+                    duration: const Duration(milliseconds: 300),
+                    order: 3,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: BlocBuilder<AddedPlayersBloc, AddedPlayersState>(
+                        builder: (context, state) {
+                          return ElevatedButton(
+                            onPressed: state.players.length < 6
+                                ? () => addPlayer(context)
+                                : null,
+                            child: const Text("Добавить"),
+                          );
                         },
-                        child: const FaIcon(FontAwesomeIcons.deleteLeft),
                       ),
                     ),
-                    onEditingComplete: () => addPlayer(context),
-                    onChanged: (newText) =>
-                        addPlayerBloc.add(AddPlayerChangeEvent(newText)),
                   ),
-                ),
-                const SizedBox(height: 20),
-                FadeAnimation(
-                  from: AxisDirection.up,
-                  duration: const Duration(milliseconds: 300),
-                  order: 3,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: BlocBuilder<AddedPlayersBloc, AddedPlayersState>(
-                      builder: (context, state) {
-                        return ElevatedButton(
-                          onPressed: state.players.length < 6
-                              ? () => addPlayer(context)
-                              : null,
-                          child: const Text("Добавить"),
-                        );
-                      },
+                  const SizedBox(height: 10),
+                  FadeAnimation(
+                    from: AxisDirection.up,
+                    duration: const Duration(milliseconds: 300),
+                    order: 4,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: BlocBuilder<AddedPlayersBloc, AddedPlayersState>(
+                        builder: (context, state) {
+                          return ElevatedButton(
+                            onPressed: state.players.length > 1
+                                ? () {
+                                    animatedSwitchPage(
+                                      context,
+                                      BlocProvider(
+                                        create: (context) =>
+                                            GameBloc(players: state.players),
+                                        child: const GameScreen(),
+                                      ),
+                                      routeAnimation:
+                                          RouteAnimation.slideBottom,
+                                      withBack: false,
+                                      clearNavigator: true,
+                                    );
+                                  }
+                                : null,
+                            child: const Text("Начать игру"),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                FadeAnimation(
-                  from: AxisDirection.up,
-                  duration: const Duration(milliseconds: 300),
-                  order: 4,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: BlocBuilder<AddedPlayersBloc, AddedPlayersState>(
-                      builder: (context, state) {
-                        return ElevatedButton(
-                          onPressed: state.players.length > 1
-                              ? () {
-                                  context
-                                      .read<GameBloc>()
-                                      .add(GameStartEvent(state.players));
-                                  animatedSwitchPage(
-                                    context,
-                                    const GameScreen(),
-                                    routeAnimation: RouteAnimation.slideBottom,
-                                    withBack: false,
-                                    clearNavigator: true,
-                                  );
-                                }
-                              : null,
-                          child: const Text("Начать игру"),
-                        );
-                      },
+                  const SizedBox(height: 10),
+                  FadeAnimation(
+                    from: AxisDirection.up,
+                    duration: const Duration(milliseconds: 300),
+                    order: 5,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: BlocBuilder<AddedPlayersBloc, AddedPlayersState>(
+                        builder: (context, state) {
+                          return ElevatedButton(
+                            onPressed: state.players.isNotEmpty
+                                ? () => addedPlayersBloc
+                                    .add(AddedPlayersClearEvent())
+                                : null,
+                            child: const Text("Отчистить список игроков"),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                FadeAnimation(
-                  from: AxisDirection.up,
-                  duration: const Duration(milliseconds: 300),
-                  order: 5,
-                  child: SizedBox(
-                    width: double.infinity,
+                  const SizedBox(height: 20),
+                  FadeAnimation(
+                    from: AxisDirection.down,
+                    duration: const Duration(milliseconds: 300),
+                    order: 6,
                     child: BlocBuilder<AddedPlayersBloc, AddedPlayersState>(
                       builder: (context, state) {
-                        return ElevatedButton(
-                          onPressed: state.players.isNotEmpty
-                              ? () =>
-                                  addedPlayersBloc.add(AddedPlayersClearEvent())
-                              : null,
-                          child: const Text("Отчистить список игроков"),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                FadeAnimation(
-                  from: AxisDirection.down,
-                  duration: const Duration(milliseconds: 300),
-                  order: 6,
-                  child: BlocBuilder<AddedPlayersBloc, AddedPlayersState>(
-                    builder: (context, state) {
-                      return Wrap(
-                        alignment: WrapAlignment.start,
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: List.generate(
-                          state.players.length,
-                          (index) => PlayerChip(
-                            player: state.players[index],
-                            deleteColor: moveColors[index % 4],
-                            onDelete: (player) => context
-                                .read<AddedPlayersBloc>()
-                                .add(AddedPlayersRemoveEvent(player)),
+                        return Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: List.generate(
+                            state.players.length,
+                            (index) => PlayerChip(
+                              player: state.players[index],
+                              deleteColor: moveColors[index % 4],
+                              onDelete: (player) => context
+                                  .read<AddedPlayersBloc>()
+                                  .add(AddedPlayersRemoveEvent(player)),
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                )
-              ],
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

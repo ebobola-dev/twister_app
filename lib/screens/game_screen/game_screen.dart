@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:twister_app/bloc/game/game_bloc.dart';
-import 'package:twister_app/bloc/game/game_event.dart';
 import 'package:twister_app/bloc/game/game_state.dart';
 import 'package:twister_app/screens/game_screen/finish_view.dart';
 import 'package:twister_app/screens/game_screen/game_view.dart';
@@ -25,10 +24,10 @@ class GameScreen extends StatelessWidget {
           child: SimpleHeader(
             leading: BlocBuilder<GameBloc, GameState>(
               buildWhen: (previous, current) =>
-                  previous.runtimeType != current.runtimeType,
+                  previous.winner != current.winner,
               builder: (context, gameState) {
                 final IconButton button;
-                if (gameState is GameFinishedState) {
+                if (gameState.winner != null) {
                   button = IconButton(
                     key: const ValueKey(1),
                     onPressed: () {
@@ -38,7 +37,6 @@ class GameScreen extends StatelessWidget {
                         routeAnimation: RouteAnimation.slideLeft,
                         clearNavigator: true,
                       );
-                      context.read<GameBloc>().add(GameSaveEvent());
                     },
                     icon: const FaIcon(FontAwesomeIcons.leftLong),
                   );
@@ -69,15 +67,12 @@ class GameScreen extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: BlocBuilder<GameBloc, GameState>(
-            buildWhen: (previous, current) =>
-                previous.runtimeType != current.runtimeType,
-            builder: (context, state) {
-              if (state is GameFinishedState) {
-                return FinishGameView(winner: state.winner);
-              } else if (state is GameStartedState) {
-                return const GameView();
+            buildWhen: (previous, current) => previous.winner != current.winner,
+            builder: (context, gameState) {
+              if (gameState.winner != null) {
+                return FinishGameView(winner: gameState.winner!);
               } else {
-                return Container();
+                return const GameView();
               }
             },
           ),
