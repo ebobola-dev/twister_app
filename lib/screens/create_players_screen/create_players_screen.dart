@@ -48,10 +48,12 @@ class CreatePlayersScreen extends StatelessWidget {
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: SimpleHeader(
-              leading: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const FaIcon(FontAwesomeIcons.arrowLeftLong),
-              ),
+              leading: Navigator.canPop(context)
+                  ? IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const FaIcon(FontAwesomeIcons.arrowLeftLong),
+                    )
+                  : null,
               title: const Text("ДОБАВЬТЕ ИГРОКОВ"),
               fadeDuration: const Duration(milliseconds: 200),
             ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:twister_app/bloc/game/game_bloc.dart';
+import 'package:twister_app/bloc/game/game_event.dart';
 import 'package:twister_app/bloc/game/game_state.dart';
 import 'package:twister_app/screens/game_screen/finish_view.dart';
 import 'package:twister_app/screens/game_screen/game_view.dart';
@@ -43,10 +44,20 @@ class GameScreen extends StatelessWidget {
                 } else {
                   button = IconButton(
                     key: const ValueKey(0),
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => const FinishGame(),
-                    ),
+                    onPressed: () {
+                      final gameBloc = context.read<GameBloc>();
+                      showDialog(
+                        context: context,
+                        builder: (context) => FinishGame(
+                          livePlayers: gameState.livePlayers,
+                          onChoiceWinner: (chosenWinner) => gameBloc.add(
+                            GameFinishEvent(chosenWinner),
+                          ),
+                          onRestartGame: () => gameBloc.add(GameRestartEvent()),
+                          onCloseGame: () => gameBloc.add(GameStopTimerEvent()),
+                        ),
+                      );
+                    },
                     icon: const FaIcon(FontAwesomeIcons.flagCheckered),
                   );
                 }
@@ -70,7 +81,7 @@ class GameScreen extends StatelessWidget {
             buildWhen: (previous, current) => previous.winner != current.winner,
             builder: (context, gameState) {
               if (gameState.winner != null) {
-                return FinishGameView(winner: gameState.winner!);
+                return const FinishGameView();
               } else {
                 return const GameView();
               }

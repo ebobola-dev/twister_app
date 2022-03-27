@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+part 'move_enums.g.dart';
+
+@HiveType(typeId: 2)
 enum BodyParts {
+  @HiveField(0)
   @JsonValue("left-hand")
   leftHand,
+  @HiveField(1)
   @JsonValue("right-hand")
   rightHand,
+  @HiveField(2)
   @JsonValue("left-foot")
   leftFoot,
+  @HiveField(3)
   @JsonValue("right-foot")
   rightFoot,
 }

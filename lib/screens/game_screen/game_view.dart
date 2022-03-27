@@ -116,10 +116,16 @@ class _GameViewState extends State<GameView> {
                     FontAwesomeIcons.circleInfo,
                     color: Colors.white,
                   ),
-                  onTap: () => showDialog(
-                    context: context,
-                    builder: (context) => const GameInfo(),
-                  ),
+                  onTap: () {
+                    final gameState = context.read<GameBloc>().state;
+                    showDialog(
+                      context: context,
+                      builder: (context) => GameInfo(
+                        moves: gameState.moves,
+                        deadPlayers: gameState.deadPlayers,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -182,29 +188,43 @@ class _GameViewState extends State<GameView> {
                               key: const ValueKey(1),
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text(
-                                  fortuneState.player,
-                                  style: const TextStyle(fontSize: 16.0),
+                                Flexible(
+                                  child: Text(
+                                    fortuneState.player,
+                                    style: const TextStyle(fontSize: 16.0),
+                                  ),
                                 ),
                                 const FaIcon(
                                   FontAwesomeIcons.rightLong,
                                 ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "${translateParts[fortuneState.part]![2]} ",
-                                      style: const TextStyle(fontSize: 16.0),
-                                    ),
-                                    Text(
-                                      translateColors[fortuneState.color]!
-                                          .toLowerCase(),
-                                      style: TextStyle(
-                                        fontSize: 16.0,
-                                        color: fortuneState.color,
+                                Flexible(
+                                  child: RichText(
+                                    textAlign: TextAlign.end,
+                                    text: TextSpan(children: [
+                                      TextSpan(
+                                        text:
+                                            "${translateParts[fortuneState.part]![2]} ",
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1!
+                                              .color,
+                                          fontFamily: "Montserrat",
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      TextSpan(
+                                        text:
+                                            translateColors[fortuneState.color]!
+                                                .toLowerCase(),
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          color: fortuneState.color,
+                                          fontFamily: "Montserrat",
+                                        ),
+                                      ),
+                                    ]),
+                                  ),
                                 ),
                               ],
                             );

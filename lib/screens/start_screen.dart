@@ -1,5 +1,7 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:twister_app/bloc/game/game_state.dart';
 import 'package:twister_app/widgets/animations/fade_animation.dart';
 import 'package:twister_app/screens/create_players_screen/create_players_screen.dart';
 import 'package:twister_app/ui_funcs.dart';
@@ -62,21 +64,27 @@ class StartScreen extends StatelessWidget {
                         const SizedBox(height: 20),
                         FadeAnimation(
                           from: AxisDirection.right,
-                          child: ElevatedButton(
-                            onPressed: null,
-                            child: const Text(
-                              "Посмотреть список игр (0)",
-                              style: TextStyle(
-                                fontSize: 16.0,
+                          child: ValueListenableBuilder(
+                            valueListenable:
+                                Hive.box<GameState>(GameState.boxName)
+                                    .listenable(),
+                            builder: (context, Box<GameState> box, widget) =>
+                                ElevatedButton(
+                              onPressed: box.isNotEmpty ? () {} : null,
+                              child: Text(
+                                "Посмотреть список игр (${box.length})",
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                ),
                               ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12.0,
-                                horizontal: 16.0,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(7.0),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 16.0,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7.0),
+                                ),
                               ),
                             ),
                           ),

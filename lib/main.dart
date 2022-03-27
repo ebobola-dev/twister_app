@@ -29,6 +29,23 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => AddPlayerBloc()),
         BlocProvider(create: (context) => AddedPlayersBloc()),
         BlocProvider(create: (context) => FortuneBloc()),
+        // BlocProvider(
+        //   create: (context) => GameBloc(
+        //     oldState: GameState(
+        //       winner: 'Абоба',
+        //       seconds: 1235,
+        //       livePlayers: ['Абоба'],
+        //       deadPlayers: [
+        //         "Длинное имя",
+        //         "Ещё длиннее имя",
+        //         "Очень длинное имя прям самое длинное",
+        //         "Длинноеимябезпробелов",
+        //         "Абоба",
+        //       ],
+        //       movePlayer: 'Абоба',
+        //     ),
+        //   ),
+        // ),
       ],
       child: ThemeProvider(
         initTheme: getThemeData(context, initDark ? darkTheme : lightTheme),

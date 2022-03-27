@@ -28,4 +28,6 @@ class GameFinishEvent extends GameEvent {
   GameFinishEvent(this.winner);
 }
 
-class GameIncrementSeconds extends GameEvent {}
+class GameIncrementSecondsEvent extends GameEvent {}
+
+class GameStopTimerEvent extends GameEvent {}

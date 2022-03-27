@@ -19,30 +19,40 @@ class MoveCard extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(8.0),
       child: Row(
+        key: const ValueKey(1),
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text(
-            move.player,
-            style: const TextStyle(fontSize: 16.0),
+          Flexible(
+            child: Text(
+              move.player,
+              style: const TextStyle(fontSize: 16.0),
+            ),
           ),
           const FaIcon(
             FontAwesomeIcons.rightLong,
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "${translateParts[move.part]![2]} ",
-                style: const TextStyle(fontSize: 16.0),
-              ),
-              Text(
-                translateColors[move.color]!.toLowerCase(),
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: move.color,
+          Flexible(
+            child: RichText(
+              textAlign: TextAlign.end,
+              text: TextSpan(children: [
+                TextSpan(
+                  text: "${translateParts[move.part]![2]} ",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Theme.of(context).textTheme.bodyText1!.color,
+                    fontFamily: "Montserrat",
+                  ),
                 ),
-              ),
-            ],
+                TextSpan(
+                  text: translateColors[move.color]!.toLowerCase(),
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: move.color,
+                    fontFamily: "Montserrat",
+                  ),
+                ),
+              ]),
+            ),
           ),
         ],
       ),

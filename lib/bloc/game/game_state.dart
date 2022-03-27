@@ -1,20 +1,34 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:twister_app/models/move/move.dart';
+import 'package:hive/hive.dart';
 
 part 'game_state.g.dart';
 
+@HiveType(typeId: 0)
 @JsonSerializable()
-class GameState extends Equatable {
-  final String? winner;
-  final List<String> livePlayers;
-  final List<String> deadPlayers;
-  final String movePlayer;
-  final String? lastMovePlayer;
-  final List<Move> moves;
-  final int seconds;
+class GameState extends HiveObject with EquatableMixin {
+  static const boxName = 'game_state_box';
 
-  const GameState({
+  @HiveField(0)
+  final int millisecondsSinceEpoch;
+  @HiveField(1)
+  final String? winner;
+  @HiveField(2)
+  final List<String> livePlayers;
+  @HiveField(3)
+  final List<String> deadPlayers;
+  @HiveField(4)
+  final String movePlayer;
+  @HiveField(5)
+  final String? lastMovePlayer;
+  @HiveField(6)
+  final List<Move> moves;
+  @HiveField(7)
+  final int seconds;
+  @HiveField(8)
+  GameState({
+    this.millisecondsSinceEpoch = 0,
     required this.livePlayers,
     required this.deadPlayers,
     required this.movePlayer,
@@ -39,6 +53,7 @@ class GameState extends Equatable {
     bool updateLastMove = false,
   }) =>
       GameState(
+        millisecondsSinceEpoch: millisecondsSinceEpoch,
         livePlayers: livePlayers ?? this.livePlayers,
         deadPlayers: deadPlayers ?? this.deadPlayers,
         movePlayer: movePlayer ?? this.movePlayer,
@@ -48,6 +63,7 @@ class GameState extends Equatable {
       );
 
   GameState win(String winner) => GameState(
+        millisecondsSinceEpoch: millisecondsSinceEpoch,
         winner: winner,
         livePlayers: [winner],
         deadPlayers: deadPlayers +
@@ -101,5 +117,13 @@ class GameState extends Equatable {
             : "0$minutes:0$seconds_";
       }
     }
+  }
+
+  save_() {
+    Hive.box<GameState>(boxName).put(millisecondsSinceEpoch.toString(), this);
+  }
+
+  delete_() {
+    Hive.box<GameState>(boxName).delete(millisecondsSinceEpoch);
   }
 }

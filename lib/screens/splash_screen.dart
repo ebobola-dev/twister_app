@@ -1,9 +1,12 @@
 import 'dart:async';
-
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
+import 'package:twister_app/bloc/game/game_state.dart';
 import 'package:twister_app/config.dart';
+import 'package:twister_app/models/move/move.dart';
+import 'package:twister_app/models/move/move_enums.dart';
 import 'package:twister_app/screens/start_screen.dart';
 import 'package:twister_app/ui_funcs.dart';
 
@@ -19,6 +22,8 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _logoController;
   late final Animation<Offset> _logoAnimation;
   Timer? _splashTimer;
+  Timer? _initAppTimer;
+  int _initMilliseconds = 0;
 
   @override
   void initState() {
@@ -34,22 +39,53 @@ class _SplashScreenState extends State<SplashScreen>
         setState(() {});
       });
     _logoController.repeat(reverse: true);
-    _splashTimer = Timer(const Duration(seconds: CONFIG.splashScreenTimer), () {
-      animatedSwitchPage(
-        context,
-        const StartScreen(),
-        routeAnimation: RouteAnimation.scale,
-        withBack: false,
-      );
-    });
+    _initAppTimer =
+        Timer(const Duration(milliseconds: 1), () => _initMilliseconds++);
     super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async => await initApp());
   }
 
   @override
   void dispose() {
     _logoController.dispose();
     _splashTimer?.cancel();
+    _initAppTimer?.cancel();
     super.dispose();
+  }
+
+  Future<void> initApp() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Hive.initFlutter();
+    Hive.registerAdapter(BodyPartsAdapter());
+    Hive.registerAdapter(MoveAdapter());
+    Hive.registerAdapter(GameStateAdapter());
+    await Hive.openBox<GameState>(GameState.boxName);
+    closeSplash();
+  }
+
+  void closeSplash() {
+    final Duration closeDuration =
+        Duration(milliseconds: CONFIG.splashScreenTimer - _initMilliseconds);
+    debugPrint(
+        "closing splashScreen after $_initMilliseconds ms., will close in ${closeDuration.inMilliseconds} ms.");
+    if (closeDuration.isNegative) {
+      animatedSwitchPage(
+        context,
+        const StartScreen(),
+        routeAnimation: RouteAnimation.scale,
+        withBack: false,
+      );
+    } else {
+      _splashTimer = Timer(
+        closeDuration,
+        () => animatedSwitchPage(
+          context,
+          const StartScreen(),
+          routeAnimation: RouteAnimation.scale,
+          withBack: false,
+        ),
+      );
+    }
   }
 
   @override

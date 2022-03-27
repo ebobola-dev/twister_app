@@ -9,9 +9,11 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   Timer? updateSecondsTimer;
 
   GameBloc({List<String>? players, GameState? oldState})
-      : assert(players != null || oldState != null),
+      : assert((players != null && oldState == null) ||
+            (players == null && oldState != null)),
         super(oldState ??
             GameState(
+              millisecondsSinceEpoch: DateTime.now().millisecondsSinceEpoch,
               livePlayers: players!,
               deadPlayers: const [],
               movePlayer: players.first,
@@ -19,19 +21,20 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     updateSecondsTimer?.cancel();
     updateSecondsTimer = Timer.periodic(
       const Duration(seconds: 1),
-      (_) => add(GameIncrementSeconds()),
+      (_) => add(GameIncrementSecondsEvent()),
     );
 
     on<GameRestartEvent>((event, emit) {
       emit(GameState(
+        millisecondsSinceEpoch: state.millisecondsSinceEpoch,
         livePlayers: state.livePlayers + state.deadPlayers,
         deadPlayers: const [],
         movePlayer: state.livePlayers.first,
-      ));
+      )..save_());
       updateSecondsTimer?.cancel();
       updateSecondsTimer = Timer.periodic(
         const Duration(seconds: 1),
-        (_) => add(GameIncrementSeconds()),
+        (_) => add(GameIncrementSecondsEvent()),
       );
     });
 
@@ -49,7 +52,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
               ],
           lastMovePlayer: state.movePlayer,
           updateLastMove: true,
-        ),
+        )..save_(),
       );
     });
 
@@ -65,15 +68,15 @@ class GameBloc extends Bloc<GameEvent, GameState> {
                   color: event.color,
                 ),
               ],
-        ),
+        )..save_(),
       );
     });
 
     on<GameRemovePlayerEvent>((event, emit) {
       if (state.livePlayers.length == 2) {
-        emit(state.win(state.livePlayers
-            .where((element) => element != event.player)
-            .first));
+        emit(state.win(
+            state.livePlayers.where((element) => element != event.player).first)
+          ..save_());
         updateSecondsTimer?.cancel();
       } else {
         String? lastPlayer = state.lastMovePlayer;
@@ -93,18 +96,22 @@ class GameBloc extends Bloc<GameEvent, GameState> {
             movePlayer: nowPlayer,
             lastMovePlayer: lastPlayer,
             updateLastMove: true,
-          ),
+          )..save_(),
         );
       }
     });
 
     on<GameFinishEvent>((event, emit) {
-      emit(state.win(event.winner));
+      emit(state.win(event.winner)..save_());
       updateSecondsTimer?.cancel();
     });
 
-    on<GameIncrementSeconds>((event, emit) {
-      emit(state.copyWith(seconds: state.seconds + 1));
+    on<GameIncrementSecondsEvent>((event, emit) {
+      emit(state.copyWith(seconds: state.seconds + 1)..save_());
+    });
+
+    on<GameStopTimerEvent>((event, emit) {
+      updateSecondsTimer?.cancel();
     });
   }
 

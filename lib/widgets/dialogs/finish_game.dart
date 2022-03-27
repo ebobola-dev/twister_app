@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:twister_app/bloc/game/game_event.dart';
 import 'package:twister_app/screens/start_screen.dart';
 import 'package:twister_app/ui_funcs.dart';
 import 'package:twister_app/widgets/animations/fade_animation.dart';
 import 'package:twister_app/widgets/animations/scale_on_create.dart';
-import 'package:twister_app/bloc/game/game_bloc.dart';
-import 'package:twister_app/bloc/game/game_state.dart';
 
 class FinishGame extends StatelessWidget {
-  const FinishGame({Key? key}) : super(key: key);
+  final List<String> livePlayers;
+  final Function(String) onChoiceWinner;
+  final VoidCallback onRestartGame;
+  final VoidCallback onCloseGame;
+  const FinishGame({
+    Key? key,
+    required this.livePlayers,
+    required this.onChoiceWinner,
+    required this.onRestartGame,
+    required this.onCloseGame,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final gameBloc = context.read<GameBloc>();
     return Center(
       child: Material(
         color: Colors.transparent,
@@ -46,42 +51,34 @@ class FinishGame extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    BlocBuilder<GameBloc, GameState>(
-                      buildWhen: (previous, current) =>
-                          previous.seconds != current.seconds,
-                      builder: (context, gameState) => Column(
-                        children: List.generate(
-                          gameState.livePlayers.length,
-                          (index) => FadeAnimation(
-                            duration: const Duration(milliseconds: 300),
-                            order: 4 + index,
-                            orderDelay: 100,
-                            from: index % 2 == 0
-                                ? AxisDirection.left
-                                : AxisDirection.right,
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 10.0),
-                              child: InkWell(
-                                onTap: () {
-                                  context.read<GameBloc>().add(
-                                        GameFinishEvent(
-                                          gameState.livePlayers[index],
-                                        ),
-                                      );
-                                  Navigator.pop(context);
-                                },
-                                borderRadius: BorderRadius.circular(5.0),
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .secondaryHeaderColor
-                                        .withOpacity(.32),
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Text(gameState.livePlayers[index]),
+                    Column(
+                      children: List.generate(
+                        livePlayers.length,
+                        (index) => FadeAnimation(
+                          duration: const Duration(milliseconds: 300),
+                          order: 4 + index,
+                          orderDelay: 100,
+                          from: index % 2 == 0
+                              ? AxisDirection.left
+                              : AxisDirection.right,
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 10.0),
+                            child: InkWell(
+                              onTap: () {
+                                onChoiceWinner(livePlayers[index]);
+                                Navigator.pop(context);
+                              },
+                              borderRadius: BorderRadius.circular(5.0),
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .secondaryHeaderColor
+                                      .withOpacity(.32),
+                                  borderRadius: BorderRadius.circular(5.0),
                                 ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(livePlayers[index]),
                               ),
                             ),
                           ),
@@ -98,11 +95,11 @@ class FinishGame extends StatelessWidget {
                 child: FadeAnimation(
                   from: AxisDirection.down,
                   duration: const Duration(milliseconds: 300),
-                  order: context.read<GameBloc>().state.livePlayers.length + 5,
+                  order: livePlayers.length + 5,
                   orderDelay: 100,
                   child: TextButton(
                     onPressed: () {
-                      // save game
+                      onCloseGame();
                       animatedSwitchPage(
                         context,
                         const StartScreen(),
@@ -120,11 +117,11 @@ class FinishGame extends StatelessWidget {
                 child: FadeAnimation(
                   from: AxisDirection.down,
                   duration: const Duration(milliseconds: 300),
-                  order: context.read<GameBloc>().state.livePlayers.length + 5,
+                  order: livePlayers.length + 5,
                   orderDelay: 100,
                   child: TextButton(
                     onPressed: () {
-                      gameBloc.add(GameRestartEvent());
+                      onRestartGame();
                       Navigator.pop(context);
                     },
                     child: Text("НАЧАТЬ ЗАНОВО".toUpperCase()),
@@ -137,7 +134,7 @@ class FinishGame extends StatelessWidget {
                 child: FadeAnimation(
                   from: AxisDirection.down,
                   duration: const Duration(milliseconds: 300),
-                  order: context.read<GameBloc>().state.livePlayers.length + 6,
+                  order: livePlayers.length + 6,
                   orderDelay: 100,
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),

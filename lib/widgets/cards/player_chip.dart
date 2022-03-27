@@ -29,9 +29,11 @@ class PlayerChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 5.0),
-            child: Text(player),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 5.0),
+              child: Text(player),
+            ),
           ),
           if (onDelete != null) ...[
             const SizedBox(width: 5),
