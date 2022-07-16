@@ -19,12 +19,8 @@ class MoveAdapter extends TypeAdapter<Move> {
     return Move(
       player: fields[0] as String,
       part: fields[1] as BodyParts,
-      color:
-          Color(int.parse(fields[2].split('(0x')[1].split(')')[0], radix: 16)),
-    )..time = TimeOfDay(
-        hour: int.parse(fields[3].split(":")[0]),
-        minute: int.parse(fields[3].split(":")[1]),
-      );
+      color: colorFromString(fields[2]),
+    )..time = timeFromString(fields[3]);
   }
 
   @override
@@ -36,9 +32,9 @@ class MoveAdapter extends TypeAdapter<Move> {
       ..writeByte(1)
       ..write(obj.part)
       ..writeByte(2)
-      ..write(obj.color.toString())
+      ..write(colorToString(obj.color))
       ..writeByte(3)
-      ..write("${obj.time.hour}:${obj.time.minute}");
+      ..write(timeToString(obj.time));
   }
 
   @override

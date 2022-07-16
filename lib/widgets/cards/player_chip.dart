@@ -7,6 +7,7 @@ class PlayerChip extends StatelessWidget {
   final Color? deleteColor;
   final EdgeInsets padding;
   final Color? backgroundColor;
+  final Color? foregroundColor;
   final BorderRadius? borderRadius;
   const PlayerChip({
     Key? key,
@@ -14,6 +15,7 @@ class PlayerChip extends StatelessWidget {
     this.onDelete,
     this.deleteColor,
     this.backgroundColor,
+    this.foregroundColor,
     this.padding = const EdgeInsets.all(5.0),
     this.borderRadius,
   }) : super(key: key);
@@ -31,8 +33,10 @@ class PlayerChip extends StatelessWidget {
         children: [
           Flexible(
             child: Padding(
-              padding: const EdgeInsets.only(left: 5.0),
-              child: Text(player),
+              padding: onDelete != null
+                  ? const EdgeInsets.only(left: 5.0)
+                  : EdgeInsets.zero,
+              child: Text(player, style: TextStyle(color: foregroundColor)),
             ),
           ),
           if (onDelete != null) ...[

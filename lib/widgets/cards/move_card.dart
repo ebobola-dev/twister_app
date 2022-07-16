@@ -34,24 +34,26 @@ class MoveCard extends StatelessWidget {
           Flexible(
             child: RichText(
               textAlign: TextAlign.end,
-              text: TextSpan(children: [
-                TextSpan(
-                  text: "${translateParts[move.part]![2]} ",
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: Theme.of(context).textTheme.bodyText1!.color,
-                    fontFamily: "Montserrat",
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: "${translateParts[move.part]![2]} ",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Theme.of(context).textTheme.bodyText1!.color,
+                      fontFamily: "Montserrat",
+                    ),
                   ),
-                ),
-                TextSpan(
-                  text: translateColors[move.color]!.toLowerCase(),
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: move.color,
-                    fontFamily: "Montserrat",
+                  TextSpan(
+                    text: translateColors[move.color]!.toLowerCase(),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: move.color,
+                      fontFamily: "Montserrat",
+                    ),
                   ),
-                ),
-              ]),
+                ],
+              ),
             ),
           ),
         ],

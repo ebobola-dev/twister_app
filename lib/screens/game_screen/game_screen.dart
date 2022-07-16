@@ -46,10 +46,11 @@ class GameScreen extends StatelessWidget {
                     key: const ValueKey(0),
                     onPressed: () {
                       final gameBloc = context.read<GameBloc>();
+                      final livePlayers = gameBloc.state.livePlayers;
                       showDialog(
                         context: context,
                         builder: (context) => FinishGame(
-                          livePlayers: gameState.livePlayers,
+                          livePlayers: livePlayers,
                           onChoiceWinner: (chosenWinner) => gameBloc.add(
                             GameFinishEvent(chosenWinner),
                           ),

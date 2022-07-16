@@ -7,6 +7,7 @@ import 'package:twister_app/bloc/fortune/fortune_bloc.dart';
 import 'package:twister_app/databases/pref/theme.dart';
 import 'package:twister_app/screens/create_players_screen/create_players_screen.dart';
 import 'package:twister_app/screens/game_screen/game_screen.dart';
+import 'package:twister_app/screens/saved_games_screen.dart';
 import 'package:twister_app/screens/splash_screen.dart';
 import 'package:twister_app/screens/start_screen.dart';
 import 'package:twister_app/themes.dart';
@@ -14,6 +15,13 @@ import 'package:twister_app/themes_constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // await Hive.initFlutter();
+  // Hive.registerAdapter(BodyPartsAdapter());
+  // Hive.registerAdapter(MoveAdapter());
+  // Hive.registerAdapter(GameStateAdapter());
+  // await Hive.openBox<GameState>(GameState.boxName);
+
   final initTheme = await PrefTheme.read();
   runApp(MyApp(initDark: initTheme ?? true));
 }
@@ -58,6 +66,7 @@ class MyApp extends StatelessWidget {
             "/splash": (context) => const SplashScreen(),
             "/start": (context) => const StartScreen(),
             "/create": (context) => CreatePlayersScreen(),
+            "/saved": (context) => const SavedGamesScreen(),
             "/game": (context) => const GameScreen(),
           },
         ),

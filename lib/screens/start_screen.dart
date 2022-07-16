@@ -2,6 +2,7 @@ import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:twister_app/bloc/game/game_state.dart';
+import 'package:twister_app/screens/saved_games_screen.dart';
 import 'package:twister_app/widgets/animations/fade_animation.dart';
 import 'package:twister_app/screens/create_players_screen/create_players_screen.dart';
 import 'package:twister_app/ui_funcs.dart';
@@ -68,9 +69,15 @@ class StartScreen extends StatelessWidget {
                             valueListenable:
                                 Hive.box<GameState>(GameState.boxName)
                                     .listenable(),
-                            builder: (context, Box<GameState> box, widget) =>
+                            builder: (context, Box<GameState> box, _) =>
                                 ElevatedButton(
-                              onPressed: box.isNotEmpty ? () {} : null,
+                              onPressed: box.isNotEmpty
+                                  ? () => animatedSwitchPage(
+                                        context,
+                                        const SavedGamesScreen(),
+                                        routeAnimation: RouteAnimation.slideTop,
+                                      )
+                                  : null,
                               child: Text(
                                 "Посмотреть список игр (${box.length})",
                                 style: const TextStyle(

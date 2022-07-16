@@ -29,7 +29,7 @@ class GameView extends StatefulWidget {
 class _GameViewState extends State<GameView> {
   final StreamController<int> spinController =
       StreamController<int>.broadcast();
-
+  final ScrollController _scrollController = ScrollController();
   Timer? _fortuneTimer;
 
   @override
@@ -59,12 +59,23 @@ class _GameViewState extends State<GameView> {
         }
       });
     });
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      if (_scrollController.hasClients) {
+        await Future.delayed(const Duration(milliseconds: 1500));
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeIn,
+        );
+      }
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     spinController.close();
+    _scrollController.dispose();
     _fortuneTimer?.cancel();
     super.dispose();
   }
@@ -74,6 +85,7 @@ class _GameViewState extends State<GameView> {
     final fortuneBloc = context.read<FortuneBloc>();
     final gameBloc = context.read<GameBloc>();
     return SingleChildScrollView(
+      controller: _scrollController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -107,6 +119,7 @@ class _GameViewState extends State<GameView> {
                   ),
                 ),
               ),
+              const SizedBox(width: 10),
               FadeAnimation(
                 from: AxisDirection.right,
                 order: 3,

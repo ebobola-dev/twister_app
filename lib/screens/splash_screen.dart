@@ -41,8 +41,8 @@ class _SplashScreenState extends State<SplashScreen>
     _logoController.repeat(reverse: true);
     _initAppTimer =
         Timer(const Duration(milliseconds: 1), () => _initMilliseconds++);
-    super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) async => await initApp());
+    super.initState();
   }
 
   @override
@@ -59,7 +59,15 @@ class _SplashScreenState extends State<SplashScreen>
     Hive.registerAdapter(BodyPartsAdapter());
     Hive.registerAdapter(MoveAdapter());
     Hive.registerAdapter(GameStateAdapter());
-    await Hive.openBox<GameState>(GameState.boxName);
+    final box = await Hive.openBox<GameState>(GameState.boxName);
+    for (final game in box.values) {
+      final moves = game.moves;
+      print("game with winner ${game.winner}");
+      for (final move in moves) {
+        print("${move.player} -> ${move.part} ${move.color}");
+      }
+      print("\n");
+    }
     closeSplash();
   }
 

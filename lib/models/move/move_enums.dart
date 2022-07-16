@@ -21,7 +21,7 @@ enum BodyParts {
 }
 
 const List<Color> moveColors = [
-  Colors.red,
+  Color(0xFFFF0000),
   Color(0xFF505FEE),
   Color(0xFFEFCD2C),
   Color(0xFF00C39A),
@@ -35,7 +35,7 @@ const Map<BodyParts, List<String>> translateParts = {
 };
 
 final Map<Color, String> translateColors = {
-  Colors.red: "Красный",
+  const Color(0xFFFF0000): "Красный",
   const Color(0xFF505FEE): "Синий",
   const Color(0xFFEFCD2C): "Жёлтый",
   const Color(0xFF00C39A): "Зелёный",

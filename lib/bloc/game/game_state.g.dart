@@ -17,33 +17,36 @@ class GameStateAdapter extends TypeAdapter<GameState> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return GameState(
-      livePlayers: (fields[1] as List).cast<String>(),
-      deadPlayers: (fields[2] as List).cast<String>(),
-      movePlayer: fields[3] as String,
-      lastMovePlayer: fields[4] as String?,
-      moves: (fields[5] as List).cast<Move>(),
-      seconds: fields[6] as int,
-      winner: fields[0] as String?,
+      millisecondsSinceEpoch: fields[0] as int,
+      livePlayers: (fields[2] as List).cast<String>(),
+      deadPlayers: (fields[3] as List).cast<String>(),
+      movePlayer: fields[4] as String,
+      lastMovePlayer: fields[5] as String?,
+      moves: (fields[6] as List).cast<Move>(),
+      seconds: fields[7] as int,
+      winner: fields[1] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, GameState obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
-      ..write(obj.winner)
+      ..write(obj.millisecondsSinceEpoch)
       ..writeByte(1)
-      ..write(obj.livePlayers)
+      ..write(obj.winner)
       ..writeByte(2)
-      ..write(obj.deadPlayers)
+      ..write(obj.livePlayers)
       ..writeByte(3)
-      ..write(obj.movePlayer)
+      ..write(obj.deadPlayers)
       ..writeByte(4)
-      ..write(obj.lastMovePlayer)
+      ..write(obj.movePlayer)
       ..writeByte(5)
-      ..write(obj.moves)
+      ..write(obj.lastMovePlayer)
       ..writeByte(6)
+      ..write(obj.moves)
+      ..writeByte(7)
       ..write(obj.seconds);
   }
 
@@ -63,6 +66,7 @@ class GameStateAdapter extends TypeAdapter<GameState> {
 // **************************************************************************
 
 GameState _$GameStateFromJson(Map<String, dynamic> json) => GameState(
+      millisecondsSinceEpoch: json['millisecondsSinceEpoch'] as int? ?? 0,
       livePlayers: (json['livePlayers'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
@@ -80,6 +84,7 @@ GameState _$GameStateFromJson(Map<String, dynamic> json) => GameState(
     );
 
 Map<String, dynamic> _$GameStateToJson(GameState instance) => <String, dynamic>{
+      'millisecondsSinceEpoch': instance.millisecondsSinceEpoch,
       'winner': instance.winner,
       'livePlayers': instance.livePlayers,
       'deadPlayers': instance.deadPlayers,

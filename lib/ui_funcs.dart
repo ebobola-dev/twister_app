@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 enum RouteAnimation {
@@ -18,6 +20,17 @@ const List<RouteAnimation> slideAnimations = [
 
 bool isDarkTheme(context) =>
     Theme.of(context).colorScheme.brightness == Brightness.dark;
+
+int todayCheck(DateTime date) {
+  final now = DateTime.now();
+  return DateTime(date.year, date.month, date.day)
+      .difference(DateTime(now.year, now.month, now.day))
+      .inDays;
+}
+
+int random(min, max) {
+  return min + Random().nextInt(max - min + 1);
+}
 
 void showSimpleWarning(
   BuildContext context,

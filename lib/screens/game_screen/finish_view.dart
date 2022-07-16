@@ -113,7 +113,7 @@ class _FinishGameViewState extends State<FinishGameView>
                           ),
                         ),
                         TextSpan(
-                          text: gameState.movePlayer.length.toString(),
+                          text: gameState.moves.length.toString(),
                           style: TextStyle(
                             fontSize: 20.0,
                             color: Theme.of(context).primaryColor,
@@ -144,7 +144,7 @@ class _FinishGameViewState extends State<FinishGameView>
                       animatedSwitchPage(
                         context,
                         CreatePlayersScreen(),
-                        routeAnimation: RouteAnimation.slideRight,
+                        routeAnimation: RouteAnimation.slideLeft,
                         clearNavigator: true,
                       );
                     },
@@ -163,7 +163,7 @@ class _FinishGameViewState extends State<FinishGameView>
                     onPressed: () => animatedSwitchPage(
                       context,
                       const StartScreen(),
-                      routeAnimation: RouteAnimation.slideLeft,
+                      routeAnimation: RouteAnimation.slideRight,
                       clearNavigator: true,
                     ),
                     child: const Text("В главное меню"),

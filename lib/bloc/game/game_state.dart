@@ -124,6 +124,6 @@ class GameState extends HiveObject with EquatableMixin {
   }
 
   delete_() {
-    Hive.box<GameState>(boxName).delete(millisecondsSinceEpoch);
+    Hive.box<GameState>(boxName).delete(millisecondsSinceEpoch.toString());
   }
 }
