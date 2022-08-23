@@ -21,3 +21,17 @@
 
 #### Пара скриншотов из светлой темы
 <img src="/assets/screenshots/saved_games_light.jpg" alt="saved_games_light" width="200"/> <img src="/assets/screenshots/wheel_light.jpg" alt="wheel_light" width="200"/>
+
+#### Используемые библиотеки (Основные)
+- **flutter_svg**
+- **lottie**
+- **flutter_bloc**
+- **simple_animations**
+- **equatable**
+- **animated_theme_switcher**
+- **shared_preferences**
+- **animated_text_kit**
+- **flutter_fortune_wheel**
+- **loading_indicator**
+- **intl**
+- **hive**
