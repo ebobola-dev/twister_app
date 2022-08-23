@@ -2,8 +2,6 @@
 
 <img src="/assets/screenshots/twister_game.jpg" alt="twister_game" width="200"/>
 
-## Getting Started
-
 #### О приложении
 - От 2-ух до 6-ти игроков
 - Все игры, игроки и ходы сохраняются
