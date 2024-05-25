@@ -5,13 +5,13 @@ ThemeData getThemeData(BuildContext context, MyTheme theme) =>
     ThemeData.light().copyWith(
       primaryColor: theme.primary,
       secondaryHeaderColor: theme.secondary,
-      backgroundColor: theme.background,
       scaffoldBackgroundColor: theme.background,
       dividerColor: const Color.fromRGBO(220, 220, 220, 1),
       iconTheme: IconThemeData(color: theme.primary),
       textTheme: Theme.of(context).textTheme.apply(
             fontFamily: 'Montserrat',
             bodyColor: theme.text,
+            displayColor: theme.text,
           ),
       appBarTheme: AppBarTheme(
         centerTitle: true,
@@ -27,13 +27,14 @@ ThemeData getThemeData(BuildContext context, MyTheme theme) =>
       textSelectionTheme: TextSelectionThemeData(cursorColor: theme.text),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          backgroundColor: theme.primary,
+          disabledBackgroundColor: theme.disable,
+          foregroundColor: Colors.white,
           textStyle: const TextStyle(
-            fontSize: 15.0,
-            color: Colors.white,
+            fontSize: 16.0,
             fontFamily: "Montserrat",
           ),
           elevation: 3,
-          primary: theme.primary,
           padding: const EdgeInsets.symmetric(
             vertical: 12.0,
             horizontal: 16.0,
@@ -41,7 +42,6 @@ ThemeData getThemeData(BuildContext context, MyTheme theme) =>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(7.0),
           ),
-          onSurface: theme.disable,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -51,11 +51,6 @@ ThemeData getThemeData(BuildContext context, MyTheme theme) =>
             color: theme.primary,
           ),
         ),
-      ),
-      colorScheme: ColorScheme.light(
-        brightness: theme.brightness,
-        primary: theme.primary,
-        secondary: theme.secondary,
       ),
       inputDecorationTheme: InputDecorationTheme(
         labelStyle: TextStyle(
@@ -91,4 +86,9 @@ ThemeData getThemeData(BuildContext context, MyTheme theme) =>
           borderRadius: BorderRadius.all(Radius.circular(10.0)),
         ),
       ),
+      colorScheme: ColorScheme.light(
+        brightness: theme.brightness,
+        primary: theme.primary,
+        secondary: theme.secondary,
+      ).copyWith(background: theme.background),
     );

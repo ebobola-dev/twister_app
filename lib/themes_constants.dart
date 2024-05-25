@@ -17,7 +17,7 @@ const lightTheme = MyTheme(
   secondary: Color(0xFFF5F7FB),
   background: Colors.white,
   text: Color(0xFF222222),
-  disable: Color(0xFF222222),
+  disable: Color(0xFFA9A9A9),
   chip: Color(0xFFe5e5e5),
   snack: Color(0xFF2C314A),
 );

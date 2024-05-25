@@ -54,12 +54,7 @@ class StartScreen extends StatelessWidget {
                               CreatePlayersScreen(),
                               routeAnimation: RouteAnimation.slideBottom,
                             ),
-                            child: const Text(
-                              "Начать новую игру",
-                              style: TextStyle(
-                                fontSize: 16.0,
-                              ),
-                            ),
+                            child: const Text("Начать новую игру"),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -78,21 +73,8 @@ class StartScreen extends StatelessWidget {
                                         routeAnimation: RouteAnimation.slideTop,
                                       )
                                   : null,
-                              child: Text(
-                                "Посмотреть список игр (${box.length})",
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12.0,
-                                  horizontal: 16.0,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(7.0),
-                                ),
-                              ),
+                              child:
+                                  Text("Посмотреть список игр (${box.length})"),
                             ),
                           ),
                         ),

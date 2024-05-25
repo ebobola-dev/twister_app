@@ -59,7 +59,7 @@ class _GameViewState extends State<GameView> {
         }
       });
     });
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_scrollController.hasClients) {
         await Future.delayed(const Duration(milliseconds: 1500));
         _scrollController.animateTo(
@@ -166,7 +166,10 @@ class _GameViewState extends State<GameView> {
                           SvgPicture.asset(
                             list[1],
                             width: 20,
-                            color: Colors.white,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ],
                       ),
@@ -221,7 +224,7 @@ class _GameViewState extends State<GameView> {
                                           fontSize: 16.0,
                                           color: Theme.of(context)
                                               .textTheme
-                                              .bodyText1!
+                                              .bodyLarge!
                                               .color,
                                           fontFamily: "Montserrat",
                                         ),

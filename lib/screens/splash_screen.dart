@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -41,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
     _logoController.repeat(reverse: true);
     _initAppTimer =
         Timer(const Duration(milliseconds: 1), () => _initMilliseconds++);
-    WidgetsBinding.instance!.addPostFrameCallback((_) async => await initApp());
+    WidgetsBinding.instance.addPostFrameCallback((_) async => await initApp());
     super.initState();
   }
 
@@ -62,11 +63,11 @@ class _SplashScreenState extends State<SplashScreen>
     final box = await Hive.openBox<GameState>(GameState.boxName);
     for (final game in box.values) {
       final moves = game.moves;
-      print("game with winner ${game.winner}");
+      log("game with winner ${game.winner}");
       for (final move in moves) {
-        print("${move.player} -> ${move.part} ${move.color}");
+        log("${move.player} -> ${move.part} ${move.color}");
       }
-      print("\n");
+      log("\n");
     }
     closeSplash();
   }

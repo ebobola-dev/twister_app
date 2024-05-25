@@ -84,7 +84,7 @@ class _FinishGameViewState extends State<FinishGameView>
                           text: " победил(а)!",
                           style: TextStyle(
                             fontSize: 20.0,
-                            color: Theme.of(context).textTheme.bodyText1!.color,
+                            color: Theme.of(context).textTheme.bodyLarge!.color,
                             fontFamily: "Montserrat",
                           ),
                         ),
@@ -108,7 +108,7 @@ class _FinishGameViewState extends State<FinishGameView>
                           text: "Всего сделано ходов: ",
                           style: TextStyle(
                             fontSize: 20.0,
-                            color: Theme.of(context).textTheme.bodyText1!.color,
+                            color: Theme.of(context).textTheme.bodyLarge!.color,
                             fontFamily: "Montserrat",
                           ),
                         ),

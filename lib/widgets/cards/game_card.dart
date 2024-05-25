@@ -41,7 +41,7 @@ class GameCard extends StatelessWidget {
         if (date.year != DateTime.now().year) {
           strDate += ".${date.year}";
         }
-        strDate += " " + DateFormat.Hm().format(date);
+        strDate += " ${DateFormat.Hm().format(date)}";
     }
     return Container(
       margin: EdgeInsets.only(bottom: bottomMargin),
@@ -93,7 +93,7 @@ class GameCard extends StatelessWidget {
                   (index) => PlayerChip(
                     player: allPlayers[index],
                     padding: const EdgeInsets.all(8.0),
-                    backgroundColor: Theme.of(context).backgroundColor,
+                    backgroundColor: Theme.of(context).colorScheme.background,
                     foregroundColor: allPlayers[index] == gameState.winner
                         ? moveColors.last
                         : null,
@@ -133,10 +133,6 @@ class GameCard extends StatelessWidget {
             right: 0,
             top: 0,
             child: SquareButton(
-              child: const FaIcon(
-                FontAwesomeIcons.circleInfo,
-                color: Colors.white,
-              ),
               onTap: () => showDialog(
                 context: context,
                 builder: (context) => GameInfo(
@@ -145,6 +141,10 @@ class GameCard extends StatelessWidget {
                 ),
               ),
               backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+              child: const FaIcon(
+                FontAwesomeIcons.circleInfo,
+                color: Colors.white,
+              ),
             ),
           ),
         ],

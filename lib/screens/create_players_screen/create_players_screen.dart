@@ -150,7 +150,7 @@ class CreatePlayersScreen extends StatelessWidget {
                                 ? () => addedPlayersBloc
                                     .add(AddedPlayersClearEvent())
                                 : null,
-                            child: const Text("Отчистить список игроков"),
+                            child: const Text("Очистить список игроков"),
                           );
                         },
                       ),

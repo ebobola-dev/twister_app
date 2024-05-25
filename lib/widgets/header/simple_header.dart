@@ -21,18 +21,18 @@ class SimpleHeader extends StatelessWidget {
       child: AppBar(
         leading: leading != null
             ? FadeAnimation(
-                child: leading!,
                 from: AxisDirection.left,
                 order: 2,
                 duration: fadeDuration,
+                child: leading!,
               )
             : null,
         title: title != null
             ? FadeAnimation(
-                child: title!,
                 from: AxisDirection.up,
                 order: 2,
                 duration: fadeDuration,
+                child: title!,
               )
             : null,
         actions: [

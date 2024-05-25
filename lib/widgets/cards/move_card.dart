@@ -40,7 +40,7 @@ class MoveCard extends StatelessWidget {
                     text: "${translateParts[move.part]![2]} ",
                     style: TextStyle(
                       fontSize: 16.0,
-                      color: Theme.of(context).textTheme.bodyText1!.color,
+                      color: Theme.of(context).textTheme.bodyLarge!.color,
                       fontFamily: "Montserrat",
                     ),
                   ),

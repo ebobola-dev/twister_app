@@ -88,9 +88,9 @@ class _SavedGamesScreenState extends State<SavedGamesScreen> {
                           _toStartScreen();
                         });
                       },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: moveColors.first),
                       child: const Text("Удалить все"),
-                      style:
-                          ElevatedButton.styleFrom(primary: moveColors.first),
                     ),
                   ),
                 ),
